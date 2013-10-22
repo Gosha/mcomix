@@ -31,6 +31,7 @@ from mcomix import bookmark_backend
 from mcomix import message_dialog
 from mcomix import callback
 from mcomix.library import backend
+from mcomix import last_visited
 
 
 class MainWindow(gtk.Window):
@@ -89,6 +90,8 @@ class MainWindow(gtk.Window):
 
         self.left_image = gtk.Image()
         self.right_image = gtk.Image()
+
+        self.last_visited = last_visited.LastVisited()
 
         # ----------------------------------------------------------------
         # Setup
@@ -560,6 +563,8 @@ class MainWindow(gtk.Window):
         self.thumbnailsidebar.update_select()
 
         self.draw_image(at_bottom=at_bottom, scroll=True)
+
+        self.last_visited.update_entry(self.filehandler, self.imagehandler)
 
     def set_page(self, num, at_bottom=False):
         if self.imagehandler.set_page(num):
@@ -1191,6 +1196,8 @@ class MainWindow(gtk.Window):
         self.imagehandler.cleanup()
         self.thumbnailsidebar.clear()
         backend.LibraryBackend().close()
+
+        self.last_visited.save_file()
 
         # This hack is to avoid Python issue #1856.
         for thread in threading.enumerate():
